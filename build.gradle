@@ -24,6 +24,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.5.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.5.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.2")
+
+//dependency added by roostGPT
+testImplementation("junit:junit:4.12")
+testImplementation("com.mayabot.mynlp:mynlp:3.0.2")
 }
 
 ext.moduleName = 'razesoldier.epub'
