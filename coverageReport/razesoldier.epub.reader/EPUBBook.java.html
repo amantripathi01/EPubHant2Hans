@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EPUBBook.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EPubHant2Hans</a> &gt; <a href="index.source.html" class="el_package">razesoldier.epub.reader</a> &gt; <span class="el_source">EPUBBook.java</span></div><h1>EPUBBook.java</h1><pre class="source lang-java linenums">/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+package razesoldier.epub.reader;
+
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Map;
+
+public class EPUBBook {
+    private String bookName;
+    private String lang;
+    private Map&lt;String, String&gt; metadata;
+    private Map&lt;String, Manifest&gt; manifests;
+    private Spines spines;
+    private NCX ncx;
+
+    @Contract(pure = true)
+<span class="nc" id="L36">    EPUBBook() {</span>
+<span class="nc" id="L37">    }</span>
+
+    void setMetadata(@NotNull String bookName, @NotNull String lang, @NotNull Map&lt;String, String&gt; metadata) {
+<span class="nc" id="L40">        this.bookName = bookName;</span>
+<span class="nc" id="L41">        this.lang = lang;</span>
+<span class="nc" id="L42">        this.metadata = metadata;</span>
+<span class="nc" id="L43">    }</span>
+
+    void setManifests(@NotNull Map&lt;String, Manifest&gt; manifests) {
+<span class="nc" id="L46">        this.manifests = manifests;</span>
+<span class="nc" id="L47">    }</span>
+
+    void setSpines(@NotNull Spines spines) {
+<span class="nc" id="L50">        this.spines = spines;</span>
+<span class="nc" id="L51">    }</span>
+
+    void setNcx(@NotNull NCX ncx) {
+<span class="nc" id="L54">        this.ncx = ncx;</span>
+<span class="nc" id="L55">    }</span>
+
+    @NotNull
+    public String getBookName() {
+<span class="nc" id="L59">        return bookName;</span>
+    }
+
+    @NotNull
+    public String getLanguage() {
+<span class="nc" id="L64">        return lang;</span>
+    }
+
+    @NotNull
+    public Map&lt;String, String&gt; getMetadata() {
+<span class="nc" id="L69">        return metadata;</span>
+    }
+
+    /**
+     * Get manifests of this book.
+     *
+     * @return A map, the key is the id of a manifest, the value is a {@link Manifest} instance.
+     */
+    @NotNull
+    public Map&lt;String, Manifest&gt; getManifests() {
+<span class="nc" id="L79">        return manifests;</span>
+    }
+
+    @NotNull
+    public Spines getSpines() {
+<span class="nc" id="L84">        return spines;</span>
+    }
+
+    @NotNull
+    public NCX getNcx() {
+<span class="nc" id="L89">        return ncx;</span>
+    }
+
+    public static class Manifest {
+        private String id;
+        private String filePath;
+        private String mediaType;
+
+        @Contract(pure = true)
+<span class="nc" id="L98">        Manifest(@NotNull String id, @NotNull String filePath, @NotNull String mediaType) {</span>
+<span class="nc" id="L99">            this.id = id;</span>
+<span class="nc" id="L100">            this.filePath = filePath;</span>
+<span class="nc" id="L101">            this.mediaType = mediaType;</span>
+<span class="nc" id="L102">        }</span>
+
+        @NotNull
+        public String getId() {
+<span class="nc" id="L106">            return id;</span>
+        }
+
+        @NotNull
+        public String getFilePath() {
+<span class="nc" id="L111">            return filePath;</span>
+        }
+
+        @NotNull
+        public String getMediaType() {
+<span class="nc" id="L116">            return mediaType;</span>
+        }
+    }
+
+    public static class Spines {
+        private List&lt;String&gt; spineList;
+        private String spineFilePath;
+
+        @Contract(pure = true)
+<span class="nc" id="L125">        Spines(@NotNull String spineFilePath, @NotNull List&lt;String&gt; spineList) {</span>
+<span class="nc" id="L126">            this.spineFilePath = spineFilePath;</span>
+<span class="nc" id="L127">            this.spineList = spineList;</span>
+<span class="nc" id="L128">        }</span>
+
+        @NotNull
+        public List&lt;String&gt; getSpineList() {
+<span class="nc" id="L132">            return spineList;</span>
+        }
+
+        @NotNull
+        public String getSpineFilePath() {
+<span class="nc" id="L137">            return spineFilePath;</span>
+        }
+    }
+
+<span class="nc" id="L141">    public static class NCX {</span>
+        private String title;
+        private String author;
+        private Map&lt;String, String&gt; metadata;
+        private Map&lt;String, EPUBBook.NCX.NavPoint&gt; navPointMap;
+
+        void setMetadata(@NotNull Map&lt;String, String&gt; metadata) {
+<span class="nc" id="L148">            this.metadata = metadata;</span>
+<span class="nc" id="L149">        }</span>
+
+        void setTitle(@NotNull String title) {
+<span class="nc" id="L152">            this.title = title;</span>
+<span class="nc" id="L153">        }</span>
+
+        void setAuthor(@NotNull String author) {
+<span class="nc" id="L156">            this.author = author;</span>
+<span class="nc" id="L157">        }</span>
+
+        void setNavPointMap(@NotNull Map&lt;String, EPUBBook.NCX.NavPoint&gt; navPointMap) {
+<span class="nc" id="L160">            this.navPointMap = navPointMap;</span>
+<span class="nc" id="L161">        }</span>
+
+        @Nullable
+        public String getTitle() {
+<span class="nc" id="L165">            return title;</span>
+        }
+
+        @Nullable
+        public String getAuthor() {
+<span class="nc" id="L170">            return author;</span>
+        }
+
+        @NotNull
+        public Map&lt;String, String&gt; getMetadata() {
+<span class="nc" id="L175">            return metadata;</span>
+        }
+
+        @NotNull
+        public Map&lt;String, NavPoint&gt; getNavPointMap() {
+<span class="nc" id="L180">            return navPointMap;</span>
+        }
+
+        public static class NavPoint {
+            private Integer order;
+            private String id;
+            private String text;
+            private String contentRef;
+
+            @Contract(pure = true)
+<span class="nc" id="L190">            NavPoint(@NotNull Integer order, @NotNull String id, @NotNull String text, @NotNull String contentRef) {</span>
+<span class="nc" id="L191">                this.order = order;</span>
+<span class="nc" id="L192">                this.id = id;</span>
+<span class="nc" id="L193">                this.text = text;</span>
+<span class="nc" id="L194">                this.contentRef = contentRef;</span>
+<span class="nc" id="L195">            }</span>
+
+            @NotNull
+            public Integer getOrder() {
+<span class="nc" id="L199">                return order;</span>
+            }
+
+            @NotNull
+            public String getId() {
+<span class="nc" id="L204">                return id;</span>
+            }
+
+            @NotNull
+            public String getText() {
+<span class="nc" id="L209">                return text;</span>
+            }
+
+            @NotNull
+            public String getContentRef() {
+<span class="nc" id="L214">                return contentRef;</span>
+            }
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

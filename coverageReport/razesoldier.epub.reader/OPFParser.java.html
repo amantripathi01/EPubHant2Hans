@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OPFParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EPubHant2Hans</a> &gt; <a href="index.source.html" class="el_package">razesoldier.epub.reader</a> &gt; <span class="el_source">OPFParser.java</span></div><h1>OPFParser.java</h1><pre class="source lang-java linenums">/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+package razesoldier.epub.reader;
+
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Parser that can parse a Open Packaging Format file (.opf).
+ * Using {@link #parse()} to get the {@link EPUBBook} instance.
+ */
+class OPFParser {
+    private Document document;
+    private EPUBBook book;
+    private String resourcePath;
+
+<span class="nc" id="L43">    OPFParser(@NotNull InputStream inputStream, @NotNull String opfFilePath) throws ParserConfigurationException, IOException, SAXException {</span>
+<span class="nc" id="L44">        document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputStream);</span>
+<span class="nc" id="L45">        resourcePath = new File(opfFilePath).getParent();</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (resourcePath == null) {</span>
+<span class="nc" id="L47">            resourcePath = &quot;/&quot;;</span>
+        } else {
+<span class="nc" id="L49">            resourcePath = &quot;/&quot; + resourcePath;</span>
+        }
+<span class="nc" id="L51">    }</span>
+
+    EPUBBook parse() {
+<span class="nc" id="L54">        book = new EPUBBook();</span>
+<span class="nc" id="L55">        readMetadata();</span>
+<span class="nc" id="L56">        readManifest();</span>
+<span class="nc" id="L57">        readSpine();</span>
+<span class="nc" id="L58">        return book;</span>
+    }
+
+    @NotNull
+    String getResourcePath() {
+<span class="nc" id="L63">        return resourcePath;</span>
+    }
+
+    private void readMetadata() {
+        // Get title meta @{
+<span class="nc" id="L68">        String title = getMetadataFromDOM(&quot;dc:title&quot;, &quot;&quot;);</span>
+        // @}
+
+        // Get language @{
+<span class="nc" id="L72">        String language = getMetadataFromDOM(&quot;dc:language&quot;, &quot;en&quot;);</span>
+        // @}
+
+        // Get all metadata @{
+<span class="nc" id="L76">        NodeList metadata = document.getElementsByTagName(&quot;metadata&quot;).item(0).getChildNodes();</span>
+<span class="nc" id="L77">        Map&lt;String, String&gt; metaMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        for (int i = 0; i &lt; metadata.getLength(); ++i) {</span>
+<span class="nc" id="L79">            Node node = metadata.item(i);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (node.getNodeName().contains(&quot;dc:&quot;)) {</span>
+<span class="nc" id="L81">                String metaName = node.getNodeName().replaceFirst(&quot;dc:&quot;, &quot;&quot;);</span>
+<span class="nc" id="L82">                metaMap.put(metaName, node.getTextContent());</span>
+            }
+        }
+        // @}
+<span class="nc" id="L86">        book.setMetadata(title, language, metaMap);</span>
+<span class="nc" id="L87">    }</span>
+
+    private void readManifest() {
+<span class="nc" id="L90">        NodeList manifests = document.getElementsByTagName(&quot;manifest&quot;).item(0).getChildNodes();</span>
+<span class="nc" id="L91">        Map&lt;String, EPUBBook.Manifest&gt; manifestMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        for (int i = 0; i &lt; manifests.getLength(); ++i) {</span>
+<span class="nc" id="L93">            Node node = manifests.item(i);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">            if (!node.getNodeName().equals(&quot;item&quot;)) {</span>
+<span class="nc" id="L95">                continue;</span>
+            }
+<span class="nc" id="L97">            NamedNodeMap attributes = node.getAttributes();</span>
+<span class="nc" id="L98">            String id = attributes.getNamedItem(&quot;id&quot;).getTextContent();</span>
+<span class="nc" id="L99">            String filePath = attributes.getNamedItem(&quot;href&quot;).getTextContent();</span>
+<span class="nc" id="L100">            String mediaType = attributes.getNamedItem(&quot;media-type&quot;).getTextContent();</span>
+<span class="nc" id="L101">            manifestMap.put(id, new EPUBBook.Manifest(id, filePath, mediaType));</span>
+        }
+<span class="nc" id="L103">        book.setManifests(manifestMap);</span>
+<span class="nc" id="L104">    }</span>
+
+    private void readSpine() {
+<span class="nc" id="L107">        Element spineNode = (Element) document.getElementsByTagName(&quot;spine&quot;).item(0);</span>
+<span class="nc" id="L108">        String spineManifestId = spineNode.getAttribute(&quot;toc&quot;);</span>
+<span class="nc" id="L109">        NodeList spines = spineNode.getChildNodes();</span>
+<span class="nc" id="L110">        List&lt;String&gt; spineList = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        for (int i = 0; i &lt; spines.getLength(); ++i) {</span>
+<span class="nc" id="L112">            Node node = spines.item(i);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (!node.getNodeName().equals(&quot;itemref&quot;)) {</span>
+<span class="nc" id="L114">                continue;</span>
+            }
+<span class="nc" id="L116">            spineList.add(node.getAttributes().getNamedItem(&quot;idref&quot;).getTextContent());</span>
+        }
+<span class="nc" id="L118">        book.setSpines(</span>
+<span class="nc" id="L119">                new EPUBBook.Spines(resourcePath + &quot;/&quot; + book.getManifests().get(spineManifestId).getFilePath(),</span>
+                        spineList)
+        );
+<span class="nc" id="L122">    }</span>
+
+    private String getMetadataFromDOM(@NotNull String nodeName, @NotNull String defaultValue) {
+<span class="nc" id="L125">        NodeList nodeList = document.getElementsByTagName(nodeName);</span>
+<span class="nc" id="L126">        String result = null;</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (nodeList.getLength() != 0) {</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            for (int i = 0; i &lt; nodeList.getLength(); ++i) {</span>
+<span class="nc" id="L129">                Node node = nodeList.item(i);</span>
+<span class="nc" id="L130">                Node parent = node.getParentNode();</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">                if (parent != null) {</span>
+<span class="nc bnc" id="L132" title="All 2 branches missed.">                    if (parent.getNodeName().equals(&quot;metadata&quot;)) {</span>
+<span class="nc" id="L133">                        result = node.getTextContent();</span>
+<span class="nc" id="L134">                        break;</span>
+                    }
+                }
+            }
+        }
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if (result == null) {</span>
+<span class="nc" id="L140">            result = defaultValue;</span>
+        }
+<span class="nc" id="L142">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

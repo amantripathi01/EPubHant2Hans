@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NCXParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">EPubHant2Hans</a> &gt; <a href="index.source.html" class="el_package">razesoldier.epub.reader</a> &gt; <span class="el_source">NCXParser.java</span></div><h1>NCXParser.java</h1><pre class="source lang-java linenums">/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+package razesoldier.epub.reader;
+
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Used to parse the NCX file (Navigation Control file for XML).
+ */
+class NCXParser {
+    private Document document;
+    private EPUBBook.NCX ncx;
+
+<span class="nc" id="L41">    NCXParser(@NotNull InputStream is) throws ParserConfigurationException, SAXException, ZipReadException {</span>
+        try {
+<span class="nc" id="L43">            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);</span>
+<span class="nc" id="L44">        } catch (IOException e) {</span>
+<span class="nc" id="L45">            throw new ZipReadException(e);</span>
+<span class="nc" id="L46">        }</span>
+<span class="nc" id="L47">    }</span>
+
+    EPUBBook.NCX parse() {
+<span class="nc" id="L50">        ncx = new EPUBBook.NCX();</span>
+<span class="nc" id="L51">        parseHead();</span>
+<span class="nc" id="L52">        parseTitle();</span>
+<span class="nc" id="L53">        parseAuthor();</span>
+<span class="nc" id="L54">        parseNavMap();</span>
+<span class="nc" id="L55">        return ncx;</span>
+    }
+
+    private void parseHead() {
+<span class="nc" id="L59">        NodeList headNodes = document.getElementsByTagName(&quot;head&quot;).item(0).getChildNodes();</span>
+<span class="nc" id="L60">        Map&lt;String, String&gt; metadata = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        for (int i = 0; i &lt; headNodes.getLength(); ++i) {</span>
+<span class="nc" id="L62">            Node node = headNodes.item(i);</span>
+<span class="nc bnc" id="L63" title="All 4 branches missed.">            if (!(node instanceof Element) || !node.getNodeName().equals(&quot;meta&quot;)) {</span>
+<span class="nc" id="L64">                continue;</span>
+            }
+<span class="nc" id="L66">            metadata.put(((Element) node).getAttribute(&quot;name&quot;), ((Element) node).getAttribute(&quot;content&quot;));</span>
+        }
+
+<span class="nc" id="L69">        ncx.setMetadata(metadata);</span>
+<span class="nc" id="L70">    }</span>
+
+    private void parseTitle() {
+<span class="nc" id="L73">        Element element = (Element) document.getElementsByTagName(&quot;docTitle&quot;).item(0);</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (element == null) {</span>
+<span class="nc" id="L75">            return;</span>
+        }
+<span class="nc" id="L77">        ncx.setTitle(element.getElementsByTagName(&quot;text&quot;).item(0).getTextContent());</span>
+<span class="nc" id="L78">    }</span>
+
+    private void parseAuthor() {
+<span class="nc" id="L81">        Element element = (Element) document.getElementsByTagName(&quot;docAuthor&quot;).item(0);</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (element == null) {</span>
+<span class="nc" id="L83">            return;</span>
+        }
+<span class="nc" id="L85">        ncx.setAuthor(element.getElementsByTagName(&quot;text&quot;).item(0).getTextContent());</span>
+<span class="nc" id="L86">    }</span>
+
+    private void parseNavMap() {
+<span class="nc" id="L89">        NodeList navMap = document.getElementsByTagName(&quot;navMap&quot;).item(0).getChildNodes();</span>
+<span class="nc" id="L90">        Map&lt;String, EPUBBook.NCX.NavPoint&gt; navPointMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        for (int i = 0; i &lt; navMap.getLength(); ++i) {</span>
+<span class="nc" id="L92">            Node node = navMap.item(i);</span>
+<span class="nc bnc" id="L93" title="All 4 branches missed.">            if (!(node instanceof Element) || !node.getNodeName().equals(&quot;navPoint&quot;)) {</span>
+<span class="nc" id="L94">                continue;</span>
+            }
+<span class="nc" id="L96">            Element element = (Element) node;</span>
+<span class="nc" id="L97">            String id = element.getAttribute(&quot;id&quot;);</span>
+<span class="nc" id="L98">            Integer order = Integer.valueOf(element.getAttribute(&quot;playOrder&quot;));</span>
+<span class="nc" id="L99">            String text = element.getElementsByTagName(&quot;text&quot;).item(0).getTextContent();</span>
+<span class="nc" id="L100">            String ref = ((Element) element.getElementsByTagName(&quot;content&quot;).item(0)).getAttribute(&quot;src&quot;);</span>
+<span class="nc" id="L101">            navPointMap.put(id, new EPUBBook.NCX.NavPoint(order, id, text, ref));</span>
+        }
+
+<span class="nc" id="L104">        ncx.setNavPointMap(navPointMap);</span>
+<span class="nc" id="L105">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
